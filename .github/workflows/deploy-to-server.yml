@@ -1,0 +1,42 @@
+name: Deploy Server
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-to-server:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Build docker image
+        run: |
+          docker build -t demo-server:${{ github.sha }} .
+
+      - name: Save docker image as tar
+        run: |
+          docker save demo-server:${{ github.sha }} -o demo-server.tar
+          chmod 644 demo-server.tar
+
+      - name: Copy docker image to droplet
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{secrets.HOST}}
+          username: ${{secrets.USERNAME}}
+          key: ${{secrets.KEY}}
+          source: demo-server.tar
+          target: ~/images
+
+      - name: Load the docker image run
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{secrets.HOST}}
+          username: ${{secrets.USERNAME}}
+          key: ${{secrets.KEY}}
+          script: |
+            docker load -i /root/images/demo-server.tar
+            docker run -d -p 8000:8000 --name demo-server demo-server
