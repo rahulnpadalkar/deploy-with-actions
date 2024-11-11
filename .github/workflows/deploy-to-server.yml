@@ -39,4 +39,5 @@ jobs:
           key: ${{secrets.KEY}}
           script: |
             docker load -i /root/images/demo-server.tar
+            docker rm -f demo-server
             docker run -d -p 8000:8000 --name demo-server demo-server:${{ github.sha }}
