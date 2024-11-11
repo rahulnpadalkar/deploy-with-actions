@@ -1,4 +1,4 @@
-FROM node:lst
+FROM node:lts
 
 COPY . .
 
