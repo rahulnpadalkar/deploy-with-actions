@@ -2,7 +2,11 @@ const express = require("express");
 const app = express();
 
 app.get("/", (req, res) => {
-  res.send({ msg: "Ready" });
+  res.send({ msg: "Ready and set!" });
+});
+
+app.get("/hello", (req, res) => {
+  res.send({ msg: "world" });
 });
 
 app.listen(8000, () => {
